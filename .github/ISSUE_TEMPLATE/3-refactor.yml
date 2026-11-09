@@ -1,0 +1,36 @@
+name: 리팩토링
+description: 동작은 그대로 두고 코드 구조를 고친다
+title: "[refactor] "
+labels: ["refactor"]
+body:
+  - type: markdown
+    attributes:
+      value: '이 이슈를 닫는 PR은 리팩토링 PR 템플릿(refactor.md)을 쓰고, 커밋은 `refactor(범위): 요약 (#이슈번호)` 형식으로 쓴다. 성능 개선은 `perf`, 서식 정리는 `style`을 쓴다.'
+  - type: textarea
+    id: target
+    attributes:
+      label: 대상
+      description: 고칠 모듈, 클래스, 파일을 쓴다.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: 문제점
+      description: 지금 구조의 어떤 점이 문제인지 쓴다.
+    validations:
+      required: true
+  - type: textarea
+    id: plan
+    attributes:
+      label: 개선 방향
+      description: 어떻게 바꿀지 쓴다.
+    validations:
+      required: true
+  - type: textarea
+    id: verify
+    attributes:
+      label: 동작 유지 확인 방법
+      description: 바꾼 뒤에도 동작이 같다는 것을 어떤 테스트로 확인할지 쓴다.
+    validations:
+      required: true

@@ -1,0 +1,27 @@
+name: 문서
+description: 문서를 새로 쓰거나 고친다
+title: "[docs] "
+labels: ["docs"]
+body:
+  - type: markdown
+    attributes:
+      value: '이 이슈를 닫는 PR은 문서 PR 템플릿(docs.md)을 쓰고, 커밋은 `docs(범위): 요약 (#이슈번호)` 형식으로 쓴다.'
+  - type: textarea
+    id: target
+    attributes:
+      label: 대상 문서
+      description: 쓰거나 고칠 문서 이름이나 경로를 쓴다.
+    validations:
+      required: true
+  - type: textarea
+    id: content
+    attributes:
+      label: 작성할 내용
+      description: 어떤 내용을 쓰거나 고칠지 쓴다.
+    validations:
+      required: true
+  - type: textarea
+    id: reason
+    attributes:
+      label: 필요한 이유
+      description: (선택)
