@@ -1,0 +1,47 @@
+name: 버그
+description: 잘못 동작하는 것을 고친다
+title: "[fix] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: '이 이슈를 닫는 PR은 버그 PR 템플릿(bug.md)을 쓰고, 커밋은 `fix(범위): 요약 (#이슈번호)` 형식으로 쓴다.'
+  - type: textarea
+    id: summary
+    attributes:
+      label: 버그 설명
+      description: 어떤 문제인지 한두 문장으로 쓴다.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 재현 방법
+      description: 누가 해도 같은 결과가 나오게 순서대로 쓴다.
+      value: |
+        1.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대한 동작
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 실제 동작
+      description: 오류 메시지나 로그가 있으면 붙인다.
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: 환경
+      description: OS, 브라우저, 버전 등 (선택)
+  - type: textarea
+    id: refs
+    attributes:
+      label: 참고 자료
+      description: 스크린샷, 관련 이슈 등 (선택)

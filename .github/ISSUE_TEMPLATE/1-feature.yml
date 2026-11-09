@@ -1,0 +1,43 @@
+name: 기능
+description: 새 기능을 만든다
+title: "[feat] "
+labels: ["feature"]
+body:
+  - type: markdown
+    attributes:
+      value: '이 이슈를 닫는 PR은 기능 PR 템플릿(feature.md)을 쓰고, 커밋은 `feat(범위): 요약 (#이슈번호)` 형식으로 쓴다.'
+  - type: textarea
+    id: summary
+    attributes:
+      label: 기능 요약
+      description: 무엇을 만드는지 한두 문장으로 쓴다.
+    validations:
+      required: true
+  - type: textarea
+    id: reason
+    attributes:
+      label: 필요한 이유
+      description: 이 기능이 왜 필요한지 쓴다.
+    validations:
+      required: true
+  - type: textarea
+    id: todo
+    attributes:
+      label: 할 일
+      description: 작업을 커밋 단위(100줄 이하)로 나눌 수 있게 잘게 적는다.
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: 완료 조건
+      description: 무엇이 되면 이 이슈를 닫는지 쓴다.
+    validations:
+      required: true
+  - type: textarea
+    id: refs
+    attributes:
+      label: 참고 자료
+      description: 설계 문서, 화면, 링크 등 (선택)

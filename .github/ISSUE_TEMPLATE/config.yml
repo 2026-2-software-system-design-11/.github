@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 컨벤션 문서
+    url: https://github.com/2026-2-software-system-design-11/.github/blob/main/CONTRIBUTING.md
+    about: 이슈, 브랜치, 커밋, PR 규칙을 먼저 읽는다.
