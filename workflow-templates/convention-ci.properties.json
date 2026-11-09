@@ -1,0 +1,6 @@
+{
+  "name": "조직 공통 CI",
+  "description": "브랜치 흐름, 이슈와 PR 템플릿, 커밋 규칙과 크기 한도를 검사하고 테스트를 돌린다.",
+  "iconName": "octicon checklist",
+  "categories": ["Continuous integration"]
+}

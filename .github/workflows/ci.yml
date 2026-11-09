@@ -1,0 +1,24 @@
+# 이 저장소(.github) 자체의 CI. 프로젝트 저장소와 같은 검사를 PR 브랜치의 스크립트로 돌린다.
+name: CI
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  convention:
+    uses: ./.github/workflows/convention.yml
+    with:
+      convention-ref: ${{ github.event.pull_request.head.sha }}
+
+  test:
+    uses: ./.github/workflows/test.yml

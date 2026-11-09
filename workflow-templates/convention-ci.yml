@@ -1,0 +1,28 @@
+# 조직 공통 CI. 프로젝트 저장소의 .github/workflows/ci.yml로 둔다.
+# convention / check: 브랜치 흐름, PR과 이슈 템플릿, 커밋 메시지, 커밋 100줄과 PR 500줄 한도
+# test / run: 빌드 파일을 보고 테스트를 돌린다
+name: CI
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  convention:
+    uses: 2026-2-software-system-design-11/.github/.github/workflows/convention.yml@main
+
+  test:
+    uses: 2026-2-software-system-design-11/.github/.github/workflows/test.yml@main
+    # 자동 감지가 맞지 않을 때만 아래 주석을 푼다
+    # with:
+    #   test-command: ./gradlew test
+    #   working-directory: backend
