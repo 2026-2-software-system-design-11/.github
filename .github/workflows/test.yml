@@ -1,0 +1,97 @@
+# 조직 공통 테스트 실행 (재사용 워크플로)
+# 빌드 파일을 보고 종류를 정한다: Gradle, Maven, Node(npm), Python(pytest).
+# 자동 감지가 맞지 않으면 test-command로 명령을 정한다.
+name: test
+
+on:
+  workflow_call:
+    inputs:
+      test-command:
+        description: 테스트 명령. 비우면 빌드 파일로 자동 감지한다
+        type: string
+        default: ""
+      working-directory:
+        description: 테스트를 돌릴 폴더
+        type: string
+        default: "."
+      java-version:
+        type: string
+        default: "21"
+      node-version:
+        type: string
+        default: "lts/*"
+      python-version:
+        type: string
+        default: "3.12"
+
+jobs:
+  run:
+    name: run
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: 프로젝트 종류 감지
+        id: detect
+        env:
+          TEST_COMMAND: ${{ inputs.test-command }}
+        run: |
+          if [ -n "$TEST_COMMAND" ]; then kind=custom
+          elif [ -f gradlew ] || [ -f build.gradle ] || [ -f build.gradle.kts ]; then kind=gradle
+          elif [ -f pom.xml ]; then kind=maven
+          elif [ -f package.json ]; then kind=node
+          elif [ -f pyproject.toml ] || [ -f requirements.txt ] || [ -f setup.py ]; then kind=python
+          else kind=none
+          fi
+          echo "kind=$kind" >> "$GITHUB_OUTPUT"
+          echo "감지한 프로젝트 종류: $kind"
+
+      - if: steps.detect.outputs.kind == 'gradle' || steps.detect.outputs.kind == 'maven'
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: ${{ inputs.java-version }}
+
+      - if: steps.detect.outputs.kind == 'node'
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - if: steps.detect.outputs.kind == 'python'
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: 테스트 실행
+        env:
+          KIND: ${{ steps.detect.outputs.kind }}
+          TEST_COMMAND: ${{ inputs.test-command }}
+        run: |
+          case "$KIND" in
+            custom)
+              bash -euo pipefail -c "$TEST_COMMAND" ;;
+            gradle)
+              if [ -f gradlew ]; then chmod +x gradlew && ./gradlew test --no-daemon; else gradle test --no-daemon; fi ;;
+            maven)
+              if [ -f mvnw ]; then chmod +x mvnw && ./mvnw -B test; else mvn -B test; fi ;;
+            node)
+              if [ -f package-lock.json ]; then npm ci; else npm install; fi
+              npm test ;;
+            python)
+              if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+              if [ -f pyproject.toml ] && grep -q '^\[project\]' pyproject.toml; then pip install -e .; fi
+              pip install pytest
+              status=0
+              python -m pytest || status=$?
+              if [ "$status" -eq 5 ]; then echo "::warning title=테스트 없음::pytest가 찾은 테스트가 없다"; status=0; fi
+              exit "$status" ;;
+            none)
+              echo "::warning title=테스트 없음::빌드 파일(gradlew, pom.xml, package.json, pyproject.toml, requirements.txt)이 없어 테스트를 건너뛴다. 명령을 정하려면 test-command 입력을 쓴다" ;;
+          esac
