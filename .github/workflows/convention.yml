@@ -1,0 +1,63 @@
+# 조직 공통 규칙 검사 (재사용 워크플로)
+# 브랜치 흐름, PR 제목과 본문 템플릿, 이슈 연결, 커밋 메시지, 커밋과 PR 크기를 검사한다.
+# 규칙 설명: CONTRIBUTING.md
+name: convention
+
+on:
+  workflow_call:
+    inputs:
+      commit-max-lines:
+        description: 커밋 하나의 변경 줄 수(추가 + 삭제) 한도
+        type: number
+        default: 100
+      pr-max-lines:
+        description: PR 전체 변경 줄 수 한도
+        type: number
+        default: 500
+      exclude-paths:
+        description: 줄 수에서 뺄 경로 패턴(쉼표나 줄바꿈으로 구분). 잠금 파일과 빌드 래퍼는 이미 빠진다
+        type: string
+        default: ""
+      convention-ref:
+        description: 검사 스크립트와 템플릿을 읽을 컨벤션 저장소 ref
+        type: string
+        default: main
+
+jobs:
+  check:
+    name: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: 프로젝트 저장소 가져오기
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: 컨벤션 저장소 가져오기
+        uses: actions/checkout@v7
+        with:
+          repository: ${{ github.repository_owner }}/.github
+          ref: ${{ inputs.convention-ref }}
+          path: .convention
+          persist-credentials: false
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: 검사 도구 설치
+        run: pip install pyyaml==6.0.3
+
+      - name: 규칙 검사
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          EXCLUDE_PATHS: ${{ inputs.exclude-paths }}
+        run: >-
+          python .convention/scripts/check_pr.py
+          --convention-dir .convention
+          --commit-max-lines ${{ inputs.commit-max-lines }}
+          --pr-max-lines ${{ inputs.pr-max-lines }}
+          --exclude "$EXCLUDE_PATHS"
